@@ -1,0 +1,32 @@
+<configurator>
+    <domain name="MoushenSense"/>
+    <!-- Use manufacturerCode to indicate that this is a manufacturer specific
+    cluster. -->
+    <cluster>
+        <name>Sample Mfq Specific Cluster</name>
+        <domain>MoushenSense</domain>
+        <description>This cluster provides an example of how the Application Framework can be extended to include manufacturer specific clusters. </description>
+        <!-- Cluster Id must be within the erg spec range 0xfc00 - Oxffff -->
+        <code>0xFC25</code>
+        <define>SAMPLE_MFG_SFECIFIC_CIAMMER</define>
+        <client init="false" tick="false">true</client>
+        <server init="false" tick="false">true</server>
+        <attribute side="server" code="0x0000" define="PEOPLE_COUNTER"                  type="INT32U"   min="0x00000000"   max="0xFFFFFFFF"   writable="true"  default="0x00000000"   optional="true" >People count</attribute>
+        <attribute side="server" code="0x0001" define="PEOPLE_SET"                      type="INT32U"   min="0x00000000"   max="0xFFFFFFFF"   writable="true"  default="0x00000000"   optional="true" >People Set</attribute>
+        <command source="client" code="0x00" name="setPoepleIncrement" optional="true" cli="set increment">
+          <description>
+            Command description for set poeple
+          </description>
+        </command>
+        <command source="client" code="0x01" name="setPoepleDincrement" optional="true" cli="set dincrement">
+          <description>
+            Command description for set poeple
+          </description>
+        </command>
+        <command source="client" code="0x02" name="setPoepleZero" optional="true" cli="set increment">
+          <description>
+            Command description for set poeple
+          </description>
+        </command>
+    </cluster>
+</configurator>
