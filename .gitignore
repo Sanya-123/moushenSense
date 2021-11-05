@@ -1,0 +1,117 @@
+# Prerequisites
+*.d
+
+# Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Kernel Module Compile Results
+*.mod*
+*.cmd
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
+*.projbuild
+
+# Eclipse
+.metadata/
+RemoteSystemsTempFiles/.project
+.settings/
+*.a
+*.o
+*.d
+wifi_manager/.cproject
+wifi_manager/.project
+sdkconfig
+sdkconfig.old
+**/build/
+#doxygen
+Doxyfile
+wifi_manager/doc/
+.project
+.cproject
+
+# Visual Studio Code
+.vscode/
+
+#Qt
+*.user
+
+build
+sdkconfig.old
+
+# SimpluStudio
+moushenSense_znet/adc
+moushenSense_znet/address-table
+moushenSense_znet/antenna-stub
+moushenSense_znet/button-interface
+moushenSense_znet/ccm-encryption
+moushenSense_znet/coexistence-stub
+moushenSense_znet/counters
+moushenSense_znet/debug-basic-library
+moushenSense_znet/debug-jtag
+moushenSense_znet/efr32
+moushenSense_znet/ember-minimal-printf
+moushenSense_znet/emdrv
+moushenSense_znet/emlib
+moushenSense_znet/external-generated-files
+moushenSense_znet/find-and-bind-target
+moushenSense_znet/form-and-join
+moushenSense_znet/GNU ARM v10.2.1 - Default
+moushenSense_znet/hal-config
+moushenSense_znet/hal-library
+moushenSense_znet/heartbeat
+moushenSense_znet/identify
+moushenSense_znet/idle-sleep
+moushenSense_znet/mbedtls
+moushenSense_znet/network-steering
+moushenSense_znet/packet-handoff
+moushenSense_znet/scan-dispatch
+moushenSense_znet/serial
+moushenSense_znet/sim-eeprom1
+moushenSense_znet/simple-main
+moushenSense_znet/strong-random
+moushenSense_znet/update-tc-link-key
+moushenSense_znet/zcl-framework-core
+moushenSense_znet/*.py
+moushenSense_znet/*.bat
+moushenSense_znet/*.bak

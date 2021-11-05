@@ -1,0 +1,1272 @@
+/* Hello World Example
+
+   This example code is in the Public Domain (or CC0 licensed, at your option.)
+
+   Unless required by applicable law or agreed to in writing, this
+   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+   CONDITIONS OF ANY KIND, either express or implied.
+*/
+#include <stdio.h>
+#include "sdkconfig.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_system.h"
+#include "esp_log.h"
+#include "esp_spi_flash.h"
+//#include "vl53l0x.h"
+#include "driver/i2c.h"
+#include "driver/rmt.h"
+#include "uart2.h"
+
+
+void analizeSensors(bool s0, bool s1, bool o_s0, bool o_s1);
+
+//vl53l0x_t *l0;
+
+//void taskL0(void *p)
+//{
+
+////    l0 = vl53l0x_config(I2C_NUM_0, 15, 2, -1, 0x52, 0);
+//    l0 = vl53l0x_config(I2C_NUM_0, 22, 21, -1, 0x29, 0);
+
+////    ESP_LOGI("GY-530", "Init GY-530:%s\n", vl53l0x_init(l0));
+//    vl53l0x_init(l0);
+//    ESP_LOGI("GY-530", "OK  Init");
+
+//    ESP_LOGI("GY-530", "Rate %f", vl53l0x_getSignalRateLimit(l0));
+
+//    vl53l0x_setSignalRateLimit(l0, 1.0/128);
+////    vl53l0x_setVcselPulsePeriod(l0, VcselPeriodPreRange, 12);
+////    vl53l0x_setVcselPulsePeriod(l0, VcselPeriodFinalRange, 8);
+
+
+
+//    ESP_LOGI("GY-530", "Range %6d", vl53l0x_readRangeSingleMillimeters(l0));
+
+
+//    while(1)
+//    {
+//        uint16_t range = vl53l0x_readRangeSingleMillimeters(l0);
+//        vTaskDelay(100);
+//        if(range != 8190)
+//        ESP_LOGI("GY-530", "Range %6d", range);
+//    }
+//}
+
+//#include "vl53l0x_api.h"
+//#include "vl53l0x_platform.h"
+
+//void print_pal_error(VL53L0X_Error Status){
+//    char buf[VL53L0X_MAX_STRING_LENGTH];
+//    VL53L0X_GetPalErrorString(Status, buf);
+//    printf("API Status: %i : %s\n", Status, buf);
+//}
+
+//void print_range_status(VL53L0X_RangingMeasurementData_t* pRangingMeasurementData){
+//    char buf[VL53L0X_MAX_STRING_LENGTH];
+//    uint8_t RangeStatus;
+
+//    /*
+//     * New Range Status: data is valid when pRangingMeasurementData->RangeStatus = 0
+//     */
+
+//    RangeStatus = pRangingMeasurementData->RangeStatus;
+
+//    VL53L0X_GetRangeStatusString(RangeStatus, buf);
+//    printf("Range Status: %i : %s\n", RangeStatus, buf);
+
+//}
+
+
+//VL53L0X_Error rangingTest(VL53L0X_Dev_t *pMyDevice)
+//{
+//    VL53L0X_Error Status = VL53L0X_ERROR_NONE;
+//    VL53L0X_RangingMeasurementData_t    RangingMeasurementData;
+//    int i;
+//    uint32_t refSpadCount;
+//    uint8_t isApertureSpads;
+//    uint8_t VhvSettings;
+//    uint8_t PhaseCal;
+
+//    if(Status == VL53L0X_ERROR_NONE)
+//    {
+//        printf ("Call of VL53L0X_StaticInit\n");
+//        Status = VL53L0X_StaticInit(pMyDevice); // Device Initialization
+//        print_pal_error(Status);
+//    }
+
+//    if(Status == VL53L0X_ERROR_NONE)
+//    {
+//        printf ("Call of VL53L0X_PerformRefCalibration\n");
+//        Status = VL53L0X_PerformRefCalibration(pMyDevice,
+//                &VhvSettings, &PhaseCal); // Device Initialization
+//        print_pal_error(Status);
+//    }
+
+//    if(Status == VL53L0X_ERROR_NONE)
+//    {
+//        printf ("Call of VL53L0X_PerformRefSpadManagement\n");
+//        Status = VL53L0X_PerformRefSpadManagement(pMyDevice,
+//                &refSpadCount, &isApertureSpads); // Device Initialization
+//        printf ("refSpadCount = %d, isApertureSpads = %d\n", refSpadCount, isApertureSpads);
+//        print_pal_error(Status);
+//    }
+
+//    if(Status == VL53L0X_ERROR_NONE)
+//    {
+
+//        // no need to do this when we use VL53L0X_PerformSingleRangingMeasurement
+//        printf ("Call of VL53L0X_SetDeviceMode\n");
+//        Status = VL53L0X_SetDeviceMode(pMyDevice, VL53L0X_DEVICEMODE_SINGLE_RANGING); // Setup in single ranging mode
+//        print_pal_error(Status);
+//    }
+
+//    // Enable/Disable Sigma and Signal check
+
+// /*   if (Status == VL53L0X_ERROR_NONE) {
+//        Status = VL53L0X_SetSequenceStepEnable(pMyDevice,VL53L0X_SEQUENCESTEP_DSS, 1);
+//    }*/
+
+//    if (Status == VL53L0X_ERROR_NONE) {
+//        Status = VL53L0X_SetLimitCheckEnable(pMyDevice,
+//                VL53L0X_CHECKENABLE_SIGMA_FINAL_RANGE, 1);
+//    }
+//    if (Status == VL53L0X_ERROR_NONE) {
+//        Status = VL53L0X_SetLimitCheckEnable(pMyDevice,
+//                VL53L0X_CHECKENABLE_SIGNAL_RATE_FINAL_RANGE, 1);
+//    }
+
+//    if (Status == VL53L0X_ERROR_NONE) {
+//        Status = VL53L0X_SetLimitCheckValue(pMyDevice,
+//                VL53L0X_CHECKENABLE_SIGNAL_RATE_FINAL_RANGE,
+//                (FixPoint1616_t)(0.1*65536));//0.1 0.25 0.25
+//    }
+//    if (Status == VL53L0X_ERROR_NONE) {
+//        Status = VL53L0X_SetLimitCheckValue(pMyDevice,
+//                VL53L0X_CHECKENABLE_SIGMA_FINAL_RANGE,
+//                (FixPoint1616_t)(60*65536));//60 32 18
+//    }
+//    if (Status == VL53L0X_ERROR_NONE) {/*High_Accuracy*/
+//        Status = VL53L0X_SetMeasurementTimingBudgetMicroSeconds(pMyDevice,
+//                33000);//33000 30000 200000
+//    }
+
+//    if (Status == VL53L0X_ERROR_NONE) {
+//        Status = VL53L0X_SetVcselPulsePeriod(pMyDevice,
+//                VL53L0X_VCSEL_PERIOD_PRE_RANGE, 18);
+//    }
+//    if (Status == VL53L0X_ERROR_NONE) {
+//        Status = VL53L0X_SetVcselPulsePeriod(pMyDevice,
+//                VL53L0X_VCSEL_PERIOD_FINAL_RANGE, 14);
+//    }
+
+
+
+//    /*
+//     *  Step  4 : Test ranging mode
+//     */
+
+//    if(Status == VL53L0X_ERROR_NONE)
+//    {
+////        for(i=0;i<50;i++){
+////            printf ("Call of VL53L0X_PerformSingleRangingMeasurement\n");
+////            Status = VL53L0X_PerformSingleRangingMeasurement(pMyDevice,
+////                    &RangingMeasurementData);
+
+////            print_pal_error(Status);
+////            print_range_status(&RangingMeasurementData);
+
+
+////            if (Status != VL53L0X_ERROR_NONE) break;
+
+////            printf("Measured distance: %i\n\n", RangingMeasurementData.RangeMilliMeter);
+
+
+////        }
+
+//        while(1)
+//        {
+//            Status = VL53L0X_PerformSingleRangingMeasurement(pMyDevice,
+//                    &RangingMeasurementData);
+
+//            if(RangingMeasurementData.RangeMilliMeter < 8000)
+//                printf("Measured distance: %6d\n\n", RangingMeasurementData.RangeMilliMeter);
+//            vTaskDelay(100);
+//        }
+//    }
+//    return Status;
+//}
+
+//extern int32_t VL53L0X_comms_initialise(uint8_t  comms_type,
+//                                        uint16_t comms_speed_khz);
+
+//void taskL1(void *p)
+//{
+//    VL53L0X_Error Status = VL53L0X_ERROR_NONE;
+//    VL53L0X_Dev_t MyDevice;
+//    VL53L0X_Dev_t *pMyDevice = &MyDevice;
+//    VL53L0X_Version_t                   Version;
+//    VL53L0X_Version_t                  *pVersion   = &Version;
+//    VL53L0X_DeviceInfo_t                DeviceInfo;
+
+//    int32_t status_int;
+//    int32_t init_done = 0;
+//    int NecleoComStatus = 0;
+//    int NecleoAutoCom = 1;
+
+////    TCHAR SerialCommStr[MAX_VALUE_NAME];
+
+////    if (argc == 1 ) {
+////       printf("Nucleo Automatic detection selected!\n");
+////       printf("To Specify a COM use: %s <yourCOM> \n", argv[0]);
+////    } else if (argc == 2 ) {
+////       printf("Nucleo Manual COM selected!\n");
+////       strcpy(SerialCommStr,argv[1]);
+////       printf("You have specified %s \n", SerialCommStr);
+////       NecleoAutoCom = 0;
+////    } else {
+////       printf("ERROR: wrong parameters !\n");
+////           printf("USAGE : %s <yourCOM> \n", argv[0]);
+////       return(1);
+////    }
+
+
+
+////    printf ("VL53L0X API Simple Ranging example\n\n");
+//////    printf ("Press a Key to continue!\n\n");
+//////    getchar();
+
+////    if (NecleoAutoCom == 1) {
+////    // Get the number of the COM attached to the Nucleo
+////    // Note that the following function will look for the
+////    // Nucleo with name USBSER000 so be careful if you have 2 Nucleo
+////    // inserted
+
+////    printf("Detect Nucleo Board ...");
+////    NecleoComStatus = GetNucleoSerialComm(SerialCommStr);
+
+////    if ((NecleoComStatus == 0) || (strcmp(SerialCommStr, "") == 0)) {
+////            printf("Error Nucleo Board not Detected!\n");
+////        return(1);
+////    }
+
+////        printf("Nucleo Board detected on %s\n\n", SerialCommStr);
+////    }
+
+//    // Initialize Comms
+//    pMyDevice->I2cDevAddr      = 0x29;
+//    pMyDevice->comms_type      =  1;
+////    pMyDevice->comms_speed_khz =  400;
+
+////    Status = VL53L0X_i2c_init(SerialCommStr, 460800);
+//    Status = VL53L0X_comms_initialise(0, 400);
+//    if (Status != VL53L0X_ERROR_NONE) {
+//        Status = VL53L0X_ERROR_CONTROL_INTERFACE;
+//        init_done = 1;
+//        printf ("Error init i2c\n");
+//    } else
+//        printf ("Init Comms\n");
+
+////    /*
+////     * Disable VL53L0X API logging if you want to run at full speed
+////     */
+////#ifdef VL53L0X_LOG_ENABLE
+////    VL53L0X_trace_config("test.log", TRACE_MODULE_ALL, TRACE_LEVEL_ALL, TRACE_FUNCTION_ALL);
+////#endif
+
+//    /*
+//     *  Get the version of the VL53L0X API running in the firmware
+//     */
+
+
+
+//    if(Status == VL53L0X_ERROR_NONE)
+//    {
+//        status_int = VL53L0X_GetVersion(pVersion);
+//        if (status_int != 0)
+//            Status = VL53L0X_ERROR_CONTROL_INTERFACE;
+//    }
+
+//    /*
+//     *  Verify the version of the VL53L0X API running in the firmware
+//     */
+
+//    if(Status == VL53L0X_ERROR_NONE)
+//    {
+//        printf("VL53L0X API Version  Your firmware has %d.%d.%d (revision %d). \n",
+//            pVersion->major, pVersion->minor, pVersion->build, pVersion->revision);
+//    }
+
+//    vTaskDelay(1000);
+
+
+//    if(Status == VL53L0X_ERROR_NONE)
+//    {
+//        printf ("Call of VL53L0X_DataInit\n");
+//        Status = VL53L0X_DataInit(&MyDevice); // Data initialization
+//        print_pal_error(Status);
+//    }
+
+//    if(Status == VL53L0X_ERROR_NONE)
+//    {
+//        Status = VL53L0X_GetDeviceInfo(&MyDevice, &DeviceInfo);
+//        if(Status == VL53L0X_ERROR_NONE)
+//        {
+//            printf("VL53L0X_GetDeviceInfo:\n");
+//            printf("Device Name : %s\n", DeviceInfo.Name);
+//            printf("Device Type : %s\n", DeviceInfo.Type);
+//            printf("Device ID : %s\n", DeviceInfo.ProductId);
+//            printf("ProductRevisionMajor : %d\n", DeviceInfo.ProductRevisionMajor);
+//        printf("ProductRevisionMinor : %d\n", DeviceInfo.ProductRevisionMinor);
+
+//        if ((DeviceInfo.ProductRevisionMinor != 1) && (DeviceInfo.ProductRevisionMinor != 1)) {
+//            printf("Error expected cut 1.1 but found cut %d.%d\n",
+//                       DeviceInfo.ProductRevisionMajor, DeviceInfo.ProductRevisionMinor);
+//                Status = VL53L0X_ERROR_NOT_SUPPORTED;
+//            }
+//        }
+//        print_pal_error(Status);
+//    }
+
+//    if(Status == VL53L0X_ERROR_NONE)
+//    {
+//        Status = rangingTest(pMyDevice);
+//    }
+
+//    print_pal_error(Status);
+
+//    // Implementation specific
+
+//    /*
+//     *  Disconnect comms - part of VL53L0X_platform.c
+//     */
+
+//    if(init_done == 0)
+//    {
+//        printf ("Close Comms\n");
+//        status_int = VL53L0X_comms_close();
+//        if (status_int != 0)
+//            Status = VL53L0X_ERROR_CONTROL_INTERFACE;
+//    }
+
+//    print_pal_error(Status);
+
+//    while (1) {
+//        vTaskDelay(1000);
+//    }
+//}
+
+#include "vl53l1_platform.h"
+#include "vl53l1_platform_user_data.h"
+#include "vl53l1_api.h"
+
+
+/*
+ * Wiring :  connect SCL cable in  GPIO 15 (D15)
+ * 			 connect SDA cable in  GPIO 16 (RX2)
+ */
+#define I2C_MASTER1_SCL_IO              18
+#define I2C_MASTER1_SDA_IO              19
+#define I2C_MASTER1_NUM                 I2C_NUM_0
+#define I2C_MASTER2_SCL_IO              26
+#define I2C_MASTER2_SDA_IO              27
+#define I2C_MASTER2_NUM                 I2C_NUM_1
+#define I2C_MASTER_TX_BUF_DISABLE       0
+#define I2C_MASTER_RX_BUF_DISABLE       0
+#define I2C_MASTER_FREQ_HZ              400000
+
+VL53L1_Dev_t 	dev1, dev2;
+VL53L1_DEV 		Dev1 = &dev1, Dev2 = &dev2;
+
+void f_Operating_error(VL53L1_Error 	Status, char *Msg)
+{
+    printf("Error %s, status=%d \n", Msg, Status);
+    printf("Sensor problem. Boot in 10 seconds. \n");
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    esp_restart();
+}
+
+char Lastmsg[100] = "";
+void f_Reading_error(VL53L1_Error 	Status, char *Msg)
+{
+    if (! strcmp (Lastmsg, Msg) ) return;
+    strcpy(Lastmsg, Msg);
+    printf("Error %s, status=%d \n", Msg, Status);
+}
+
+static void  f_i2c_init(void)
+{
+    i2c_config_t 	conf1, conf2;
+    int				Status;
+
+    int i2c_master_port 	= I2C_MASTER1_NUM;
+
+    conf1.mode 				= I2C_MODE_MASTER;
+
+    conf1.sda_io_num 		= I2C_MASTER1_SDA_IO;
+    conf1.sda_pullup_en 		= GPIO_PULLUP_ENABLE;
+
+    conf1.scl_io_num 		= I2C_MASTER1_SCL_IO;
+    conf1.scl_pullup_en 		= GPIO_PULLUP_ENABLE;
+
+    conf1.master.clk_speed 	= I2C_MASTER_FREQ_HZ;
+
+    conf2 = conf1;
+
+    Status = i2c_param_config(i2c_master_port, &conf1);
+    if (Status != ESP_OK)	f_Operating_error(Status, "i2c_param_config");
+
+    printf("i2c_param_config - Ok. \n");
+
+
+    Status = i2c_driver_install(i2c_master_port, conf1.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
+    if (Status != ESP_OK)	f_Operating_error(Status, "i2c_driver_install");
+
+    printf("i2c_driver_install - Ok. \n");
+
+
+    i2c_master_port = I2C_MASTER2_NUM;
+    conf2.sda_io_num 		= I2C_MASTER2_SDA_IO;
+    conf2.scl_io_num 		= I2C_MASTER2_SCL_IO;
+
+    Status = i2c_param_config(i2c_master_port, &conf2);
+    if (Status != ESP_OK)	f_Operating_error(Status, "i2c_param_config");
+
+    printf("i2c_param_config - Ok. \n");
+
+
+    Status = i2c_driver_install(i2c_master_port, conf2.mode, I2C_MASTER_RX_BUF_DISABLE, I2C_MASTER_TX_BUF_DISABLE, 0);
+    if (Status != ESP_OK)	f_Operating_error(Status, "i2c_driver_install");
+
+    printf("i2c_driver_install - Ok. \n");
+
+}
+
+
+VL53L1_Error f_vl53l1_init(VL53L1_DEV 	Dev)
+{
+    VL53L1_Error 	Status 	 		= VL53L1_ERROR_NONE;
+//    Dev->I2cHandle 	= I2C_MASTER1_NUM;
+    Dev->I2cDevAddr = 0x52;
+
+    Status = VL53L1_WaitDeviceBooted(Dev);
+    if (Status != VL53L1_ERROR_NONE)	f_Operating_error(Status, "VL53L1_WaitDeviceBooted");
+
+    Status = VL53L1_DataInit(Dev);
+    if (Status != VL53L1_ERROR_NONE)	f_Operating_error(Status, "VL53L1_DataInit");
+
+    Status = VL53L1_StaticInit(Dev);
+    if (Status != VL53L1_ERROR_NONE)	f_Operating_error(Status, "VL53L1_StaticInit");
+
+    printf("VL53L1_SetDistanceMode Inicio\n");
+    Status = VL53L1_SetDistanceMode(Dev, VL53L1_DISTANCEMODE_LONG);
+    if (Status != VL53L1_ERROR_NONE)	f_Operating_error(Status, "VL53L1_Distance mode");
+
+    Status = VL53L1_SetMeasurementTimingBudgetMicroSeconds(Dev, 200000);//50000
+    if (Status != VL53L1_ERROR_NONE)	f_Operating_error(Status, "VL53L1_SetMeasurementTimingBudgetMicroSeconds");
+
+    Status = VL53L1_SetInterMeasurementPeriodMilliSeconds(Dev, 2000);
+    if (Status != VL53L1_ERROR_NONE)	f_Operating_error(Status, "VL53L1_SetInterMeasurementPeriodMilliSeconds");
+
+    Status = VL53L1_StartMeasurement(Dev);
+    if (Status != VL53L1_ERROR_NONE)	f_Operating_error(Status, "VL53L1_StartMeasurement");
+
+    return(Status);
+}
+
+int f_read_sensor(VL53L1_DEV 	Dev)
+{
+    VL53L1_Error 						Status	= 999;
+    VL53L1_RangingMeasurementData_t		RangingData;
+    uint8_t 							pDataReady;
+    int									retry = 0;
+
+    RangingData.RangeMilliMeter = 0;
+
+    while (Status != VL53L1_ERROR_NONE)
+    {
+        Status = VL53L1_GetMeasurementDataReady( Dev , &pDataReady);
+        if (Status != VL53L1_ERROR_NONE)
+        {
+//            f_Reading_error(Status, "VL53L1_GetMeasurementDataReady");
+            continue;
+//            return -1;
+        }
+
+        Status = VL53L1_GetRangingMeasurementData(Dev, &RangingData);
+        if (Status != VL53L1_ERROR_NONE)
+        {
+//            f_Reading_error(Status, "VL53L1_GetRangingMeasurementData");
+            continue;
+//            return -1;
+        }
+
+        Status = RangingData.RangeStatus;
+        if (Status != VL53L1_ERROR_NONE)
+        {
+//            f_Reading_error(Status, "VL53L1_GetRangingMeasurementData - RangeStatus");
+//            return -1;
+        }
+
+        retry++;
+        if (retry > 100)	return(-1);
+    }
+
+    Status = VL53L1_ClearInterruptAndStartMeasurement( Dev );
+    if (Status != VL53L1_ERROR_NONE)	f_Reading_error(Status, "VL53L1_ClearInterruptAndStartMeasurement");
+
+    memset(Lastmsg,0,sizeof(Lastmsg));
+
+    return (RangingData.RangeMilliMeter);
+}
+
+#define POROG_FIND_PEOPLE_mm        400
+
+
+void taskL2(void *p)
+{
+    int 					Blink = 0, Stat1, Stat2;
+    VL53L1_Error 			Status;
+
+    bool peopleOnSensor0 = false, peopleOnSensor1 = false;
+    bool old_peopleOnSensor0 = false, old_peopleOnSensor1 = false;
+
+    f_i2c_init();
+
+//    gpio_set_direction(GPIO_NUM_2, GPIO_MODE_OUTPUT);
+
+    Dev1->I2cHandle 	= I2C_MASTER1_NUM;
+    Status = f_vl53l1_init(Dev1);
+    if (Status != VL53L1_ERROR_NONE)	f_Operating_error(Status, "vl53l1_init");
+
+    Dev2->I2cHandle 	= I2C_MASTER2_NUM;
+    Status = f_vl53l1_init(Dev2);
+    if (Status != VL53L1_ERROR_NONE)	f_Operating_error(Status, "vl53l1_init");
+
+    ESP_LOGI("VL53L1x", " Init OK");
+    while (	1 )
+    {
+        vTaskDelay(50 / portTICK_PERIOD_MS);				// Aguardar antes do próximo teste
+
+
+        Stat1 = f_read_sensor(Dev1);
+        if (Stat1 == -1)
+        {
+//            Status = f_vl53l1_init(Dev1);
+//            if (Status != VL53L1_ERROR_NONE)	f_Operating_error(Status, "vl53l1_init");
+            peopleOnSensor0 = false;
+        }
+        else
+        {
+            printf("Distance0 =%d mm\n", Stat1);
+            peopleOnSensor0 = Stat1 < POROG_FIND_PEOPLE_mm;
+        }
+
+        Stat2 = f_read_sensor(Dev2);
+        if (Stat2 == -1)
+        {
+//            Status = f_vl53l1_init(Dev1);
+//            if (Status != VL53L1_ERROR_NONE)	f_Operating_error(Status, "vl53l1_init");
+            peopleOnSensor1 = false;
+        }
+        else
+        {
+            printf("Distance1 =%d mm\n", Stat2);
+            peopleOnSensor1 = Stat2 < POROG_FIND_PEOPLE_mm;
+        }
+
+        analizeSensors(peopleOnSensor0, peopleOnSensor1, old_peopleOnSensor0, old_peopleOnSensor1);
+
+
+        if(peopleOnSensor0 != old_peopleOnSensor0)
+        {
+            ESP_LOGI("Sensor", "Sensor0 %s;%4d", peopleOnSensor0 ? "People IN " : "People OUT", Stat1);
+            old_peopleOnSensor0 = peopleOnSensor0;
+        }
+        if(peopleOnSensor1 != old_peopleOnSensor1)
+        {
+            ESP_LOGI("Sensor", "Sensor1 %s;%4d", peopleOnSensor1 ? "People IN " : "People OUT", Stat2);
+            old_peopleOnSensor1 = peopleOnSensor1;
+        }
+
+
+    }
+}
+
+//#include "vl53l1x.h"
+
+//void taskL3(void *p)
+//{
+//    vl53l1x_t *vl53l1 = vl53l1x_config(I2C_MASTER1_NUM, I2C_MASTER1_SCL_IO, I2C_MASTER1_SDA_IO, 4, 0x52, 0);
+//    const char *res = vl53l1x_init(vl53l1);
+//    if(res)
+//    {
+//        ESP_LOGE("vl53l1x", "Error init:%s", res);
+//        while (1) {
+//            vTaskDelay(100 / portTICK_PERIOD_MS);
+//        }
+//    }
+////    vl53l1x_setDistanceMode(vl53l1, VL53L1X_Long);
+//    while(1)
+//    {
+//        vTaskDelay(100 / portTICK_PERIOD_MS);
+//        printf("Distanse = %5d;\n", vl53l1x_readSingle(vl53l1, 1));
+//    }
+//}
+
+#include "driver/adc.h"
+#include "esp_adc_cal.h"
+
+#define DEFAULT_VREF    1100        //Use adc2_vref_to_gpio() to obtain a better estimate
+#define NO_OF_SAMPLES   256          //Multisampling
+#define POROG_FIND_PEOPLE_mV_V0     500     //порог по определею нахождения человека на сенсоре
+#define POROG_FIND_PEOPLE_mV_V1     600     //порог по определею нахождения человека на сенсоре
+#define POROG_DISTANSE_mm           1000.0   //порог в мм при котором принято считать что человек нашолся
+
+#define UART_CMD_SET_MASTER_SIZE        0x93
+#define UART_CMD_SET_SLAVE_INCREMENT    0x94
+#define UART_CMD_SET_SLAVE_DINCREMENT   0x95
+
+//protocol interface
+/* example size == 0x00100039
+ * set master room siza {0x93, 0x39, 0x00, 0x10, 0x00}
+ * set slave room increment {0x94}
+ * set slave room dincrement {0x94}
+ */
+
+esp_adc_cal_characteristics_t *adc1_chars, *adc2_chars;
+
+const adc_channel_t channel_0 = ADC1_CHANNEL_4;     //GPIO32 ADC1
+const adc_channel_t channel_1 = ADC1_CHANNEL_5;     //GPIO33 ADC1
+const adc_channel_t channel_2 = ADC2_CHANNEL_8;     //GPIO25 ADC2
+const adc_bits_width_t width = ADC_WIDTH_BIT_12;
+
+const adc_atten_t atten = ADC_ATTEN_DB_0;
+const adc_unit_t unit = ADC_UNIT_1;
+
+static void check_efuse(void)
+{
+    //Check if TP is burned into eFuse
+    if (esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_TP) == ESP_OK) {
+        printf("eFuse Two Point: Supported\n");
+    } else {
+        printf("eFuse Two Point: NOT supported\n");
+    }
+    //Check Vref is burned into eFuse
+    if (esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_VREF) == ESP_OK) {
+        printf("eFuse Vref: Supported\n");
+    } else {
+        printf("eFuse Vref: NOT supported\n");
+    }
+}
+
+static void print_char_val_type(esp_adc_cal_value_t val_type)
+{
+    if (val_type == ESP_ADC_CAL_VAL_EFUSE_TP) {
+        printf("Characterized using Two Point Value\n");
+    } else if (val_type == ESP_ADC_CAL_VAL_EFUSE_VREF) {
+        printf("Characterized using eFuse Vref\n");
+    } else {
+        printf("Characterized using Default Vref\n");
+    }
+}
+
+typedef enum{
+    NONO = 0,
+    PeopleOnS0,
+    PeopleOnS1,
+    PeopleOnS,
+}StateSensors;
+
+uint32_t countPoeple = 0;
+int32_t countPoepleSlaveTMP = 0;
+int32_t countPoepleSlave = 0;
+//void (*slaveSensors)(bool ink);
+
+void taskUART(void *p)
+{//так раблоты с UART
+    (void)p;
+
+    uint32_t oldCountPoeple = 0;
+
+    while(1)
+    {
+        //if master room size change
+        if(oldCountPoeple != countPoeple)
+        {
+            oldCountPoeple = countPoeple;
+            uint8_t buffUart[] = {UART_CMD_SET_MASTER_SIZE,
+                                  (countPoeple >> 0 ) & 0xFF,
+                                  (countPoeple >> 8 ) & 0xFF,
+                                  (countPoeple >> 16) & 0xFF,
+                                  (countPoeple >> 24) & 0xFF};
+            for(int i = 0 ; i < sizeof(buffUart); i++)
+                uart2_putChar(buffUart[i]);
+
+        }
+        //if slave room change
+        if(countPoepleSlave < 0)
+        {
+            countPoepleSlave = 0;
+            uart2_putChar(UART_CMD_SET_SLAVE_DINCREMENT);
+        }
+        else if(countPoepleSlave > 0)
+        {
+            countPoepleSlave = 0;
+            uart2_putChar(UART_CMD_SET_SLAVE_INCREMENT);
+        }
+
+        //if resive data
+        while(uart2_rxBufSize() >= 5)//жду пока буфер не наполниться на 5 символов
+        {
+            if(uart2_getChar() == UART_CMD_SET_MASTER_SIZE)//ищу заголовок пакета
+            {
+                uint8_t buffUart[4];
+                for(int i = 0; i < 4 ; i++)
+                {
+                    buffUart[i] = uart2_getChar();
+                }
+                countPoeple = buffUart[0] | (buffUart[1] >> 8) | (buffUart[2] >> 16) | (buffUart[3] >> 24);
+                ESP_LOGI("UART", "Master Room:%d", countPoeple);
+            }
+        }
+
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
+}
+
+void analizeSensors(bool s0, bool s1, bool o_s0, bool o_s1)
+{
+    static StateSensors state = NONO;
+    if(s0 != o_s0)
+    {
+        if(s0 == true)
+        {
+            if(state == NONO)
+            {
+                state = PeopleOnS0;
+            }
+            else if(state == PeopleOnS1)
+            {
+                state = PeopleOnS;
+                //slave room--
+                countPoepleSlave--;
+                if(countPoepleSlaveTMP > 0) countPoepleSlaveTMP--;
+                ESP_LOGI("Slave Room", "slave room--;S=%d", countPoepleSlaveTMP);
+            }
+        }
+        else
+        {
+            if(state == PeopleOnS0)
+            {
+                state = NONO;
+            }
+            else if(state == PeopleOnS)
+            {
+                state = PeopleOnS1;
+                //slave room++
+                countPoepleSlave++;
+                countPoepleSlaveTMP++;
+                ESP_LOGI("Slave Room", "slave room++S=%d", countPoepleSlaveTMP);
+            }
+        }
+    }
+    if(s1 != o_s1)
+    {
+        if(s1 == true)
+        {
+            if(state == NONO)
+            {
+                state = PeopleOnS1;
+            }
+            else if(state == PeopleOnS0)
+            {
+                state = PeopleOnS;
+                //this room--
+                if(countPoeple > 0) countPoeple--;
+                ESP_LOGI("Master Room", "this room--;M=%d", countPoeple);
+            }
+        }
+        else
+        {
+            if(state == PeopleOnS1)
+            {
+                state = NONO;
+            }
+            else if(state == PeopleOnS)
+            {
+                state = PeopleOnS0;
+                //this room++
+                countPoeple++;
+                ESP_LOGI("Master Room", "this room++;M=%d", countPoeple);
+            }
+        }
+    }
+}
+
+void taskADC(void *p)
+{
+    //Check if Two Point or Vref are burned into eFuse
+    check_efuse();
+
+    //Configure ADC
+    adc1_config_width(width);
+    adc1_config_channel_atten(channel_0, atten);
+    adc1_config_channel_atten(channel_1, atten);
+
+//    adc2_config_width(width);
+    adc2_config_channel_atten(channel_2, atten);
+
+    //Characterize ADC
+    adc1_chars = calloc(1, sizeof(esp_adc_cal_characteristics_t));
+    adc2_chars = calloc(1, sizeof(esp_adc_cal_characteristics_t));
+    print_char_val_type(esp_adc_cal_characterize(unit, atten, width, DEFAULT_VREF, adc1_chars));
+    print_char_val_type(esp_adc_cal_characterize(unit, atten, width, DEFAULT_VREF, adc2_chars));
+
+
+    uint32_t voltage0 = 0, voltage1 = 0;
+    int adc1_reading = 0, adc2_reading = 0;
+    bool peopleOnSensor0 = false, peopleOnSensor1 = false;
+    bool old_peopleOnSensor0 = false, old_peopleOnSensor1 = false;
+
+    while (1) {
+
+        uint32_t adc1_reading = 0, adc2_reading = 0;
+        int readDataADC2;
+        //Multisampling
+        for (int i = 0; i < NO_OF_SAMPLES; i++) {
+            adc1_reading += adc1_get_raw((adc1_channel_t)channel_1);
+            adc2_get_raw((adc2_channel_t)channel_2, width, &readDataADC2);
+            adc2_reading += readDataADC2;
+        }
+        adc1_reading /= NO_OF_SAMPLES;
+        adc2_reading /= NO_OF_SAMPLES;
+
+//        //скользящее среднее
+//        voltage0 = (esp_adc_cal_raw_to_voltage(adc1_reading, adc1_chars) + (NO_OF_SAMPLES - 1)*voltage0)/NO_OF_SAMPLES;
+//        voltage1 = (esp_adc_cal_raw_to_voltage(adc2_reading, adc2_chars) + (NO_OF_SAMPLES - 1)*voltage1)/NO_OF_SAMPLES;
+//        printf("Raw: %6d:%6d\tVoltage: %4d:%4dmV\n", adc1_reading, adc2_reading, voltage1, voltage2);
+//        vTaskDelay(1000 / portTICK_PERIOD_MS);
+
+        //
+        voltage0 = (esp_adc_cal_raw_to_voltage(adc1_reading, adc1_chars));
+        voltage1 = (esp_adc_cal_raw_to_voltage(adc2_reading, adc2_chars));
+        peopleOnSensor0 = voltage0 > POROG_FIND_PEOPLE_mV_V0;
+        peopleOnSensor1 = voltage1 > POROG_FIND_PEOPLE_mV_V1;
+
+        analizeSensors(peopleOnSensor0, peopleOnSensor1, old_peopleOnSensor0, old_peopleOnSensor1);
+
+        if(peopleOnSensor0 != old_peopleOnSensor0)
+        {
+            ESP_LOGI("Sensor", "Sensor0 %s;%4d", peopleOnSensor0 ? "People IN " : "People OUT", voltage0);
+            old_peopleOnSensor0 = peopleOnSensor0;
+        }
+        if(peopleOnSensor1 != old_peopleOnSensor1)
+        {
+            ESP_LOGI("Sensor", "Sensor1 %s;%4d", peopleOnSensor1 ? "People IN " : "People OUT", voltage1);
+            old_peopleOnSensor1 = peopleOnSensor1;
+        }
+
+        vTaskDelay(1 / portTICK_PERIOD_MS);
+    }
+}
+//https://github.com/kylehendricks/esp32-salt-level-sensor/blob/master/main/main.c
+
+#define RMT_TX_CHANNEL RMT_CHANNEL_0
+#define RMT_TX2_CHANNEL RMT_CHANNEL_3
+#define RMT_RX_CHANNEL RMT_CHANNEL_1
+#define RMT_RX2_CHANNEL RMT_CHANNEL_2
+#define PING_TX_PIN 22
+#define PING_TX2_PIN 23
+#define PING_RX_PIN 32
+#define PING_RX2_PIN 33
+
+#define ECHO_TIMEOUT_US 18500 // Max echo time in μs
+
+// 80MHz/80 == 1μs ticks
+#define RMT_CLK_DIV 80 // 1μs precision
+
+RingbufHandle_t rx_ring_buffer_handle = NULL, rx2_ring_buffer_handle = NULL;
+rmt_item32_t items[] = {
+    // 10μs pulse
+    {{{ 10, 1, 0, 0 }}}
+};
+char msg_buffer[128];
+#define SENSOR_FULL_LVL_INCHES          100     /*1inc ~ 25.4mm*/
+
+void rmt_tx_init()
+{
+    rmt_config_t txConfig = {
+        .rmt_mode = RMT_MODE_TX,
+        .channel = RMT_TX_CHANNEL,
+        .gpio_num = PING_TX_PIN,
+        .mem_block_num = 1,
+        .tx_config.loop_en = 0,
+        .tx_config.carrier_en = 0,
+        .tx_config.idle_output_en = 1,
+        .tx_config.idle_level = 0,
+        .clk_div = RMT_CLK_DIV
+    };
+
+    ESP_ERROR_CHECK(rmt_config(&txConfig));
+    ESP_ERROR_CHECK(rmt_driver_install(txConfig.channel, 0, 0));
+
+    txConfig.channel = RMT_TX2_CHANNEL;
+    txConfig.gpio_num = PING_TX2_PIN;
+
+    ESP_ERROR_CHECK(rmt_config(&txConfig));
+    ESP_ERROR_CHECK(rmt_driver_install(txConfig.channel, 0, 0));
+}
+
+void rmt_rx_init()
+{
+    rmt_config_t rxConfig = {
+        .rmt_mode = RMT_MODE_RX,
+        .channel = RMT_RX_CHANNEL,
+        .gpio_num = PING_RX_PIN,
+        .clk_div = RMT_CLK_DIV,
+        .mem_block_num = 1,
+        .rx_config.idle_threshold = ECHO_TIMEOUT_US
+    };
+
+    ESP_ERROR_CHECK(rmt_config(&rxConfig));
+    ESP_ERROR_CHECK(rmt_driver_install(rxConfig.channel, 128, 0));
+    ESP_ERROR_CHECK(rmt_get_ringbuf_handle(rxConfig.channel, &rx_ring_buffer_handle));
+
+    rxConfig.channel = RMT_RX2_CHANNEL;
+    rxConfig.gpio_num = PING_RX2_PIN;
+    ESP_ERROR_CHECK(rmt_config(&rxConfig));
+    ESP_ERROR_CHECK(rmt_driver_install(rxConfig.channel, 128, 0));
+    ESP_ERROR_CHECK(rmt_get_ringbuf_handle(rxConfig.channel, &rx2_ring_buffer_handle));
+}
+
+void take_reading(void *pvParameter)
+{
+    rmt_tx_init();
+    rmt_rx_init();
+    // Write the 10us trigger pulse
+
+    while(1)
+    {
+        ESP_ERROR_CHECK(rmt_write_items(RMT_TX_CHANNEL, items, 1, true));
+
+        ESP_ERROR_CHECK(rmt_rx_start(RMT_RX_CHANNEL, 1));
+//        ESP_ERROR_CHECK(rmt_rx_start(RMT_RX2_CHANNEL, 1));
+
+        size_t rx_size = 0;
+        size_t rx2_size = 0;
+        rmt_item32_t* item = (rmt_item32_t*) xRingbufferReceive(rx_ring_buffer_handle, &rx_size, 1000);
+
+        vTaskDelay(1 / portTICK_PERIOD_MS);
+
+        //read data2
+        ESP_ERROR_CHECK(rmt_write_items(RMT_TX2_CHANNEL, items, 1, true));
+
+        ESP_ERROR_CHECK(rmt_rx_start(RMT_RX2_CHANNEL, 1));
+
+        rmt_item32_t* item2 = (rmt_item32_t*) xRingbufferReceive(rx2_ring_buffer_handle, &rx2_size, 1000);
+
+        if ((item == NULL) || (item2 == NULL))
+        {
+            ESP_LOGW("HC-SR04", "RMT read timeout");
+        }
+        else if(rx_size)
+        {
+            // Got something
+            float distance = item->duration0 / 148.0 * 25.4; // to inches to mm
+            float distance2 = item2->duration0 / 148.0 * 25.4; // to inches to mm
+
+
+            int msg_size = sprintf(msg_buffer, "{\"distance\":%0.1f,\"distance\":%0.1f}", distance, distance2);
+
+            ESP_LOGI("HC-SR04", "%s\n", msg_buffer);
+//            esp_mqtt_publish(CONFIG_MQTT_SALT_LEVEL_TOPIC, (void*) msg_buffer, msg_size, 0, 1);
+
+            vRingbufferReturnItem(rx_ring_buffer_handle, (void*) item);
+            vRingbufferReturnItem(rx2_ring_buffer_handle, (void*) item2);
+        }
+        else
+        {
+            ESP_LOGI("HC-SR04", "Received end packet");
+            vRingbufferReturnItem(rx_ring_buffer_handle, (void*) item);
+            vRingbufferReturnItem(rx2_ring_buffer_handle, (void*) item2);
+        }
+
+        ESP_ERROR_CHECK(rmt_rx_stop(RMT_RX_CHANNEL));
+        ESP_ERROR_CHECK(rmt_rx_stop(RMT_RX2_CHANNEL));
+
+        vTaskDelay(500 / portTICK_PERIOD_MS);
+    }
+
+    vTaskDelete(NULL);
+}
+
+uint32_t readADC()
+{
+    uint32_t adc1_reading = 0;
+    //Multisampling
+    for (int i = 0; i < NO_OF_SAMPLES; i++) {
+        adc1_reading += adc1_get_raw((adc1_channel_t)channel_1);
+    }
+    adc1_reading /= NO_OF_SAMPLES;
+
+//        //скользящее среднее
+//        voltage0 = (esp_adc_cal_raw_to_voltage(adc1_reading, adc1_chars) + (NO_OF_SAMPLES - 1)*voltage0)/NO_OF_SAMPLES;
+    //
+    return (esp_adc_cal_raw_to_voltage(adc1_reading, adc1_chars));
+}
+
+float readHC()
+{
+    float distance = 2000;
+    ESP_ERROR_CHECK(rmt_write_items(RMT_TX_CHANNEL, items, 1, true));
+
+    ESP_ERROR_CHECK(rmt_rx_start(RMT_RX_CHANNEL, 1));
+
+    size_t rx_size = 0;
+    rmt_item32_t* item = (rmt_item32_t*) xRingbufferReceive(rx_ring_buffer_handle, &rx_size, 1000);
+
+    if (item == NULL)
+    {
+//        ESP_LOGW("HC-SR04", "RMT read timeout");
+    }
+    else if(rx_size)
+    {
+        // Got something
+        distance = item->duration0 / 148.0 * 25.4; // to inches
+        if(distance < 10.0) distance = 2000;
+
+        vRingbufferReturnItem(rx_ring_buffer_handle, (void*) item);
+    }
+    else
+    {
+//        ESP_LOGI("HC-SR04", "Received end packet");
+        vRingbufferReturnItem(rx_ring_buffer_handle, (void*) item);
+    }
+
+    ESP_ERROR_CHECK(rmt_rx_stop(RMT_RX_CHANNEL));
+
+    return distance;
+}
+
+void taskADC_HC(void *p)
+{
+    (void)p;
+    //init HC-SR04
+    rmt_tx_init();
+    rmt_rx_init();
+
+    //init ADC
+
+    //Check if Two Point or Vref are burned into eFuse
+    check_efuse();
+
+    //Configure ADC
+    adc1_config_width(width);
+    adc1_config_channel_atten(channel_1, atten);
+
+    //Characterize ADC
+    adc1_chars = calloc(1, sizeof(esp_adc_cal_characteristics_t));
+    print_char_val_type(esp_adc_cal_characterize(unit, atten, width, DEFAULT_VREF, adc1_chars));
+
+
+    uint32_t sensorLight = 0;
+    float sensorNoise = 0;
+    bool peopleOnSensor0 = false, peopleOnSensor1 = false;
+    bool old_peopleOnSensor0 = false, old_peopleOnSensor1 = false;
+
+
+    while(1){
+        sensorLight = readADC();
+        sensorNoise = readHC();
+
+        peopleOnSensor0 = sensorLight > POROG_FIND_PEOPLE_mV_V0;
+        peopleOnSensor1 = sensorNoise < POROG_DISTANSE_mm;
+
+//        ESP_LOGI("Sernse", "Noise=%4d;light=%4d;", (uint32_t)sensorNoise, (uint32_t)sensorLight);
+
+        analizeSensors(peopleOnSensor0, peopleOnSensor1, old_peopleOnSensor0, old_peopleOnSensor1);
+
+        if(peopleOnSensor0 != old_peopleOnSensor0)
+        {
+//            ESP_LOGI("Sensor", "Sensor0 %s;%4d", peopleOnSensor0 ? "People IN " : "People OUT", sensorLight);
+            old_peopleOnSensor0 = peopleOnSensor0;
+        }
+        if(peopleOnSensor1 != old_peopleOnSensor1)
+        {
+//            ESP_LOGI("Sensor", "Sensor1 %s;%4f", peopleOnSensor1 ? "People IN " : "People OUT", sensorNoise);
+            old_peopleOnSensor1 = peopleOnSensor1;
+        }
+
+        vTaskDelay(1 / portTICK_PERIOD_MS);
+    }
+}
+
+void readHC2(float *f0, float *f1)
+{
+    float distance = 2000;
+    float distance2 = 2000;
+    ESP_ERROR_CHECK(rmt_write_items(RMT_TX_CHANNEL, items, 1, true));
+
+    ESP_ERROR_CHECK(rmt_rx_start(RMT_RX_CHANNEL, 1));
+
+    size_t rx_size = 0;
+    size_t rx2_size = 0;
+    rmt_item32_t* item = (rmt_item32_t*) xRingbufferReceive(rx_ring_buffer_handle, &rx_size, 1000);
+
+    vTaskDelay(1);
+
+    ESP_ERROR_CHECK(rmt_write_items(RMT_TX2_CHANNEL, items, 1, true));
+    ESP_ERROR_CHECK(rmt_rx_start(RMT_RX2_CHANNEL, 1));
+
+    rmt_item32_t* item2 = (rmt_item32_t*) xRingbufferReceive(rx2_ring_buffer_handle, &rx2_size, 1000);
+
+    if ((item == NULL) || (item2 == NULL))
+    {
+//        ESP_LOGW("HC-SR04", "RMT read timeout");
+    }
+    else if((rx_size != 0) && (rx2_size != 0))
+    {
+        // Got something
+        distance = item->duration0 / 5.8; // to mm
+        if(distance < 10.0) distance = 2000;
+        distance2 = item2->duration0 / 5.8; // to mm
+        if(distance2 < 10.0) distance2 = 2000;
+
+        vRingbufferReturnItem(rx_ring_buffer_handle, (void*) item);
+        vRingbufferReturnItem(rx2_ring_buffer_handle, (void*) item2);
+    }
+    else
+    {
+//        ESP_LOGI("HC-SR04", "Received end packet");
+        vRingbufferReturnItem(rx_ring_buffer_handle, (void*) item);
+        vRingbufferReturnItem(rx2_ring_buffer_handle, (void*) item2);
+    }
+
+    ESP_ERROR_CHECK(rmt_rx_stop(RMT_RX_CHANNEL));
+    ESP_ERROR_CHECK(rmt_rx_stop(RMT_RX2_CHANNEL));
+
+    *f0 = distance;
+    *f1 = distance2;
+}
+
+#define FILTER_SIZE     5
+
+void sortData(float *data, int size)
+{
+    for(int i = 0 ; i < size; i++)
+    {
+        for(int j = i+1 ; j < size; j++)
+        {
+            if(data[j] < data[i])
+            {//swap
+                float tmp = data[j];
+                data[j] = data[i];
+                data[i] = tmp;
+            }
+        }
+    }
+}
+
+void medianFiltring(float *l0, float *l1)
+{
+    static float bufferL0[FILTER_SIZE] = {0}, bufferL1[FILTER_SIZE] = {0};
+    static int pointBuff = 0;
+
+    bufferL0[pointBuff] = *l0;
+    bufferL1[pointBuff] = *l1;
+    pointBuff++;
+
+    if(pointBuff == FILTER_SIZE)    pointBuff = 0;
+
+    float sosrtDataL0[FILTER_SIZE], sosrtDataL1[FILTER_SIZE];
+
+    memcpy(sosrtDataL0, bufferL0, sizeof(sosrtDataL0));
+    memcpy(sosrtDataL1, bufferL1, sizeof(sosrtDataL1));
+
+    sortData(sosrtDataL0, FILTER_SIZE);
+    sortData(sosrtDataL1, FILTER_SIZE);
+
+    *l0 = sosrtDataL0[FILTER_SIZE / 2];
+    *l1 = sosrtDataL1[FILTER_SIZE / 2];
+}
+
+void taskHC(void *p)
+{
+    (void)p;
+    //init HC-SR04
+    rmt_tx_init();
+    rmt_rx_init();
+
+
+    float sensorNoise = 0, sensorNoise2 = 0;
+    bool peopleOnSensor0 = false, peopleOnSensor1 = false;
+    bool old_peopleOnSensor0 = false, old_peopleOnSensor1 = false;
+
+
+    while(1){
+        readHC2(&sensorNoise, &sensorNoise2);
+
+        medianFiltring(&sensorNoise, &sensorNoise2);
+
+        peopleOnSensor0 = sensorNoise < POROG_DISTANSE_mm;
+        peopleOnSensor1 = sensorNoise2 < POROG_DISTANSE_mm;
+
+//        ESP_LOGI("Sernse", "M=%4d;S=%4dNoise=%4d;light=%4d;", countPoeple, countPoepleSlaveTMP, (uint32_t)sensorNoise, (uint32_t)sensorNoise2);
+
+        analizeSensors(peopleOnSensor0, peopleOnSensor1, old_peopleOnSensor0, old_peopleOnSensor1);
+
+        if(peopleOnSensor0 != old_peopleOnSensor0)
+        {
+//            ESP_LOGI("Sensor", "Sensor0 %s;%4d", peopleOnSensor0 ? "People IN " : "People OUT", sensorLight);
+            old_peopleOnSensor0 = peopleOnSensor0;
+        }
+        if(peopleOnSensor1 != old_peopleOnSensor1)
+        {
+//            ESP_LOGI("Sensor", "Sensor1 %s;%4f", peopleOnSensor1 ? "People IN " : "People OUT", sensorNoise);
+            old_peopleOnSensor1 = peopleOnSensor1;
+        }
+
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
+}
+
+
+void app_main(void)
+{
+    uart2_init();
+    printf("Hi!\n");
+
+    /* Print chip information */
+    esp_chip_info_t chip_info;
+    esp_chip_info(&chip_info);
+    printf("This is %s chip with %d CPU core(s), WiFi%s%s, ",
+            CONFIG_IDF_TARGET,
+            chip_info.cores,
+            (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
+            (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
+
+    printf("silicon revision %d, ", chip_info.revision);
+
+    printf("%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
+            (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
+
+    printf("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
+
+
+
+//    xTaskCreate(taskL0, "lenght0", 4096, NULL, 2, NULL);
+//    xTaskCreate(taskL1, "lenght1", 4096, NULL, 2, NULL);
+//
+//    xTaskCreate(taskL3, "lenght3", 4096, NULL, 2, NULL);
+
+//    xTaskCreate(taskL2, "lenght2", 4096, NULL, 2, NULL);
+//    xTaskCreate(taskADC, "lenght2", 4096, NULL, 2, NULL);
+//    xTaskCreate(take_reading, "lenght4", 4096, NULL, 2, NULL);
+//    xTaskCreate(taskADC_HC, "lenght4", 4096, NULL, 2, NULL);
+    xTaskCreatePinnedToCore(taskHC, "lenght5", 4096, NULL, 2, NULL, 1);
+
+    xTaskCreatePinnedToCore(taskUART, "uart", 4096, NULL, 1, NULL, 0);
+
+    return;
+}
