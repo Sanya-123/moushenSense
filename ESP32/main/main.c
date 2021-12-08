@@ -433,6 +433,67 @@ void taskHC(void *p)
     }
 }
 
+#define GPIO_INPUT_M        26
+#define GPIO_INPUT_S        27
+#define GPIO_INPUT_PIN_SEL  ((1ULL<<GPIO_INPUT_M) | (1ULL<<GPIO_INPUT_S))
+
+void taskE18(void *p)
+{
+    (void)p;
+    //init E18-D80NK
+
+    gpio_config_t io_conf;
+    //disable interrupt
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    //disable pull-down mode
+    io_conf.pull_down_en = 0;
+    //disable pull-up mode
+    io_conf.pull_up_en = 0;
+
+    //bit mask of the pins, use GPIO4/5 here
+    io_conf.pin_bit_mask = GPIO_INPUT_PIN_SEL;
+    //set as input mode
+    io_conf.mode = GPIO_MODE_INPUT;
+//    //enable pull-up mode
+//    io_conf.pull_up_en = 1;
+    gpio_config(&io_conf);
+
+
+
+
+//    float sensorNoise = 0, sensorNoise2 = 0;
+    bool peopleOnSensor0 = false, peopleOnSensor1 = false;
+    bool old_peopleOnSensor0 = false, old_peopleOnSensor1 = false;
+
+
+    while(1){
+//        readHC2(&sensorNoise, &sensorNoise2);
+
+//        medianFiltring(&sensorNoise, &sensorNoise2);
+
+
+        peopleOnSensor0 = gpio_get_level(GPIO_INPUT_M);
+        peopleOnSensor1 = gpio_get_level(GPIO_INPUT_S);
+
+//        ESP_LOGI("Sernse", "M=%4d;S=%4dNoise=%4d;light=%4d;", countPoeple, countPoepleSlaveTMP, (uint32_t)sensorNoise, (uint32_t)sensorNoise2);
+
+        analizeSensors(peopleOnSensor0, peopleOnSensor1, old_peopleOnSensor0, old_peopleOnSensor1);
+
+        if(peopleOnSensor0 != old_peopleOnSensor0)
+        {
+//            ESP_LOGI("Sensor", "Sensor0 %s;%4d", peopleOnSensor0 ? "People IN " : "People OUT", sensorLight);
+            old_peopleOnSensor0 = peopleOnSensor0;
+        }
+        if(peopleOnSensor1 != old_peopleOnSensor1)
+        {
+//            ESP_LOGI("Sensor", "Sensor1 %s;%4f", peopleOnSensor1 ? "People IN " : "People OUT", sensorNoise);
+            old_peopleOnSensor1 = peopleOnSensor1;
+        }
+
+        vTaskDelay(1 / portTICK_PERIOD_MS);
+    }
+}
+
 extern EventGroupHandle_t s_wifi_event_group;
 
 static void log_error_if_nonzero(const char * message, int error_code)
@@ -578,7 +639,8 @@ void app_main(void)
     printf("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
 
-    xTaskCreatePinnedToCore(taskHC, "lenght5", 4096, NULL, 2, NULL, 1);
+//    xTaskCreatePinnedToCore(taskHC, "lenght5", 4096, NULL, 2, NULL, 1);
+    xTaskCreatePinnedToCore(taskE18, "lenght6", 4096, NULL, 2, NULL, 1);
 
     xTaskCreatePinnedToCore(taskUART, "uart", 4096, NULL, 1, NULL, 0);
 
